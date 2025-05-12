@@ -162,6 +162,7 @@ const Sidebar = React.forwardRef<
     side?: "left" | "right"
     variant?: "sidebar" | "floating" | "inset"
     collapsible?: "offcanvas" | "icon" | "none"
+    defaultOpen?: boolean // Explicitly accept defaultOpen
   }
 >(
   (
@@ -171,7 +172,8 @@ const Sidebar = React.forwardRef<
       collapsible = "offcanvas",
       className,
       children,
-      ...props
+      defaultOpen, // Destructure defaultOpen
+      ...restProps // Use restProps for remaining div-compatible attributes
     },
     ref
   ) => {
@@ -185,7 +187,7 @@ const Sidebar = React.forwardRef<
             className
           )}
           ref={ref}
-          {...props}
+          {...restProps}
         >
           {children}
         </div>
@@ -194,11 +196,16 @@ const Sidebar = React.forwardRef<
 
     if (isMobile) {
       return (
-        <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+        <Sheet 
+          open={openMobile} 
+          onOpenChange={setOpenMobile} 
+          defaultOpen={defaultOpen} // Pass destructured defaultOpen to Sheet
+          {...restProps} // Pass other div-compatible props (like className) to Sheet
+        >
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden" // Specific className for SheetContent
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -212,14 +219,16 @@ const Sidebar = React.forwardRef<
       )
     }
 
+    // Desktop view
     return (
       <div
-        ref={ref}
+        ref={ref} // ref is on the semantic root for the desktop sidebar structure
         className="group peer hidden md:block text-sidebar-foreground"
         data-state={state}
         data-collapsible={state === "collapsed" ? collapsible : ""}
         data-variant={variant}
         data-side={side}
+        // Do not spread ...restProps here if this is just a wrapper
       >
         {/* This is what handles the sidebar gap on desktop */}
         <div
@@ -232,19 +241,18 @@ const Sidebar = React.forwardRef<
               : "group-data-[collapsible=icon]:w-[--sidebar-width-icon]"
           )}
         />
-        <div
+        <div // This is the div that was receiving the incorrect `defaultOpen` prop
           className={cn(
             "duration-200 fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] ease-linear md:flex",
             side === "left"
               ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
               : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
-            // Adjust the padding for floating and inset variants.
             variant === "floating" || variant === "inset"
               ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)]"
               : "group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l",
-            className
+            className // Apply the passed className here
           )}
-          {...props}
+          {...restProps} // Spread only the div-compatible props
         >
           <div
             data-sidebar="sidebar"
