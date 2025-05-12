@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -16,6 +17,7 @@ const availableCurrencies = [
   { value: 'EUR', label: 'EUR - Euro' },
   { value: 'GBP', label: 'GBP - British Pound Sterling' },
   { value: 'JPY', label: 'JPY - Japanese Yen' },
+  { value: 'INR', label: 'INR - Indian Rupee' },
 ];
 
 export default function SettingsPage() {
@@ -157,3 +159,4 @@ export default function SettingsPage() {
     </AppLayout>
   );
 }
+
