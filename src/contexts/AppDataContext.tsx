@@ -1,3 +1,4 @@
+// src/contexts/AppDataContext.tsx
 "use client";
 
 import type { AppData, Expense, Income, Budget } from "@/types";
@@ -8,11 +9,11 @@ interface AppDataContextType {
   data: AppData;
   loading: boolean;
   addExpense: (expense: Omit<Expense, "id" | "userId">) => void;
+  deleteExpense: (expenseId: string) => void;
   addIncome: (income: Omit<Income, "id" | "userId">) => void;
   addBudget: (budget: Omit<Budget, "id" | "userId">) => void;
   updateBudget: (budget: Budget) => void;
   getBudgetsByMonth: (monthYear: string) => Budget[];
-  // TODO: Add update/delete functions
   importData: (importedData: AppData) => void;
   exportData: () => AppData;
 }
@@ -80,6 +81,14 @@ export const AppDataProvider = ({ children }: { children: ReactNode }) => {
     }));
   };
 
+  const deleteExpense = (expenseId: string) => {
+    if (!user) return;
+    setData((prevData) => ({
+      ...prevData,
+      expenses: prevData.expenses.filter(expense => expense.id !== expenseId),
+    }));
+  };
+
   const addIncome = (income: Omit<Income, "id" | "userId">) => {
     if (!user) return;
     const newIncome: Income = { ...income, id: Date.now().toString(), userId: user.id };
@@ -128,7 +137,7 @@ export const AppDataProvider = ({ children }: { children: ReactNode }) => {
 
 
   return (
-    <AppDataContext.Provider value={{ data, loading, addExpense, addIncome, addBudget, updateBudget, getBudgetsByMonth, importData, exportData }}>
+    <AppDataContext.Provider value={{ data, loading, addExpense, deleteExpense, addIncome, addBudget, updateBudget, getBudgetsByMonth, importData, exportData }}>
       {children}
     </AppDataContext.Provider>
   );

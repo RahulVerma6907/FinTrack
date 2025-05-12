@@ -1,6 +1,7 @@
+// src/app/expenses/page.tsx
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import { ExpenseForm } from '@/components/forms/ExpenseForm';
 import { useAppData } from '@/contexts/AppDataContext';
@@ -10,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Trash2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -18,12 +19,25 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from '@/hooks/use-toast';
 
 export default function ExpensesPage() {
-  const { data, loading } = useAppData();
-  const [isFormOpen, setIsFormOpen] = React.useState(false);
+  const { data, loading, deleteExpense } = useAppData();
+  const { toast } = useToast();
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
@@ -33,6 +47,23 @@ export default function ExpensesPage() {
     [...data.expenses].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
     [data.expenses]
   );
+
+  const handleDeleteClick = (expenseId: string) => {
+    setExpenseToDelete(expenseId);
+    setIsAlertOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (expenseToDelete) {
+      deleteExpense(expenseToDelete);
+      toast({
+        title: "Expense Deleted",
+        description: "The expense has been successfully deleted.",
+      });
+      setExpenseToDelete(null);
+    }
+    setIsAlertOpen(false);
+  };
 
   return (
     <AppLayout>
@@ -80,6 +111,7 @@ export default function ExpensesPage() {
                       <TableHead>Category</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead className="text-right">Amount</TableHead>
+                      <TableHead className="text-center">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -93,6 +125,16 @@ export default function ExpensesPage() {
                         <TableCell className="text-right text-destructive font-semibold">
                           -{formatCurrency(expense.amount)}
                         </TableCell>
+                        <TableCell className="text-center">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteClick(expense.id)}
+                            aria-label="Delete expense"
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -102,6 +144,23 @@ export default function ExpensesPage() {
           </CardContent>
         </Card>
       </div>
+
+      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the selected expense.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setExpenseToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppLayout>
   );
 }
