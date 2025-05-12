@@ -37,7 +37,7 @@ const AppSidebar = () => {
   const pathname = usePathname();
 
   return (
-    <Sidebar collapsible="icon" variant="sidebar" defaultOpen={true}>
+    <Sidebar collapsible="icon" variant="sidebar">
       <SidebarHeader className="border-b">
         <Link href="/dashboard" className="flex items-center gap-2 p-2">
           <Landmark className="h-6 w-6 text-primary" />
