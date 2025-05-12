@@ -4,6 +4,7 @@ export interface User {
   id: string;
   name?: string | null;
   email?: string | null;
+  profilePictureUrl?: string | null; // Added for profile picture
   // Add other profile fields as needed
   currencyPreference?: string;
   notificationSettings?: {
@@ -43,3 +44,4 @@ export interface AppData {
   budgets: Budget[];
   notificationsSent?: Record<string, boolean>; // e.g., { "budget_1_2024-08_approaching": true }
 }
+

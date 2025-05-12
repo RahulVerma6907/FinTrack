@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { User } from "@/types";
@@ -27,7 +28,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = (email: string, name?: string) => {
-    const newUser: User = { id: Date.now().toString(), email, name: name || "User" };
+    // Ensure new users don't have a profilePictureUrl initially, unless provided
+    const newUser: User = { 
+      id: Date.now().toString(), 
+      email, 
+      name: name || "User", 
+      profilePictureUrl: null // Explicitly null for new users, can be updated later
+    };
     setUser(newUser);
     localStorage.setItem("finTrackUser", JSON.stringify(newUser));
   };
@@ -39,6 +46,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   
   const updateUserProfile = (profileData: Partial<User>) => {
     if (user) {
+      // If profilePictureUrl is explicitly passed as null, it means remove the picture.
+      // If profilePictureUrl is undefined in profileData, it means no change to the picture.
+      // The spread operator handles this merging correctly.
       const updatedUser = { ...user, ...profileData };
       setUser(updatedUser);
       localStorage.setItem("finTrackUser", JSON.stringify(updatedUser));

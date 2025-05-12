@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -52,7 +53,11 @@ const AppHeader = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                   <Avatar className="h-9 w-9">
-                    <AvatarImage src={`https://picsum.photos/seed/${user.email}/40/40`} alt={user.name || 'User'} data-ai-hint="abstract avatar" />
+                    <AvatarImage 
+                      src={user.profilePictureUrl || `https://picsum.photos/seed/${user.email}/40/40`} 
+                      alt={user.name || 'User'} 
+                      data-ai-hint="abstract avatar" 
+                    />
                     <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                   </Avatar>
                 </Button>
