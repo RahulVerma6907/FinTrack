@@ -8,7 +8,7 @@ export interface User {
   currencyPreference?: string;
   notificationSettings?: {
     email?: boolean;
-    sms?: boolean;
+    sms?: boolean; // Retain for potential future use, though not implemented
   };
 }
 
@@ -22,7 +22,7 @@ export interface Expense {
 }
 
 export interface Income {
-  id: string;
+  id:string;
   userId: string;
   source: IncomeCategory;
   amount: number;
@@ -41,4 +41,5 @@ export interface AppData {
   expenses: Expense[];
   incomes: Income[];
   budgets: Budget[];
+  notificationsSent?: Record<string, boolean>; // e.g., { "budget_1_2024-08_approaching": true }
 }
