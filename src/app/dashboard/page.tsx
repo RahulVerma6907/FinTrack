@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -8,17 +9,24 @@ import { RecentTransactions } from '@/components/dashboard/RecentTransactions';
 import { ExpenseChart } from '@/components/dashboard/ExpenseChart';
 import { useAppData } from '@/contexts/AppDataContext';
 import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function DashboardPage() {
-  const { data, loading } = useAppData();
+  const { data, loading: appDataLoading } = useAppData();
+  const { user, loading: authLoading } = useAuth();
 
   const totalIncome = React.useMemo(() => data.incomes.reduce((sum, item) => sum + item.amount, 0), [data.incomes]);
   const totalExpenses = React.useMemo(() => data.expenses.reduce((sum, item) => sum + item.amount, 0), [data.expenses]);
   const netBalance = totalIncome - totalExpenses;
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+    return new Intl.NumberFormat('en-US', { 
+      style: 'currency', 
+      currency: user?.currencyPreference || 'USD' 
+    }).format(amount);
   };
+
+  const loading = appDataLoading || authLoading;
 
   if (loading) {
     return (
@@ -83,3 +91,4 @@ export default function DashboardPage() {
     </AppLayout>
   );
 }
+

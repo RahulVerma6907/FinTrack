@@ -1,9 +1,11 @@
+
 "use client";
 
 import React, { useState, useMemo } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import { BudgetForm } from '@/components/forms/BudgetForm';
 import { useAppData } from '@/contexts/AppDataContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
@@ -22,7 +24,8 @@ import { format, addMonths, subMonths } from 'date-fns';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function BudgetsPage() {
-  const { data, loading } = useAppData();
+  const { data, loading: appDataLoading } = useAppData();
+  const { user, loading: authLoading } = useAuth();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<BudgetType | undefined>(undefined);
   
@@ -62,6 +65,8 @@ export default function BudgetsPage() {
       label: format(date, "MMMM yyyy"),
     };
   });
+  
+  const loading = appDataLoading || authLoading;
 
   return (
     <AppLayout>
@@ -130,6 +135,7 @@ export default function BudgetsPage() {
                       budget={budget} 
                       expensesForMonth={expensesForSelectedMonth}
                       onEdit={handleEditBudget}
+                      currencyPreference={user?.currencyPreference || 'USD'}
                     />
                   ))}
                 </div>
@@ -141,3 +147,4 @@ export default function BudgetsPage() {
     </AppLayout>
   );
 }
+

@@ -1,3 +1,4 @@
+
 // src/app/expenses/page.tsx
 "use client";
 
@@ -5,6 +6,7 @@ import React, { useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import { ExpenseForm } from '@/components/forms/ExpenseForm';
 import { useAppData } from '@/contexts/AppDataContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -33,14 +35,18 @@ import {
 import { useToast } from '@/hooks/use-toast';
 
 export default function ExpensesPage() {
-  const { data, loading, deleteExpense } = useAppData();
+  const { data, loading: appDataLoading, deleteExpense } = useAppData();
+  const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+    return new Intl.NumberFormat('en-US', { 
+      style: 'currency', 
+      currency: user?.currencyPreference || 'USD' 
+    }).format(amount);
   };
 
   const sortedExpenses = React.useMemo(() => 
@@ -64,6 +70,8 @@ export default function ExpensesPage() {
     }
     setIsAlertOpen(false);
   };
+
+  const loading = appDataLoading || authLoading;
 
   return (
     <AppLayout>
@@ -164,3 +172,4 @@ export default function ExpensesPage() {
     </AppLayout>
   );
 }
+

@@ -1,7 +1,9 @@
+
 "use client";
 
 import React from 'react';
 import { useAppData } from '@/contexts/AppDataContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +14,7 @@ import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 
 export const RecentTransactions = () => {
   const { data } = useAppData();
+  const { user } = useAuth();
 
   const combinedTransactions = [
     ...data.expenses.map(e => ({ ...e, type: 'expense' as const })),
@@ -21,7 +24,10 @@ export const RecentTransactions = () => {
   const sortedTransactions = combinedTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 10);
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+    return new Intl.NumberFormat('en-US', { 
+      style: 'currency', 
+      currency: user?.currencyPreference || 'USD' 
+    }).format(amount);
   };
 
   return (
@@ -81,3 +87,4 @@ export const RecentTransactions = () => {
     </Card>
   );
 };
+

@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -12,9 +13,10 @@ interface BudgetListItemProps {
   budget: BudgetType;
   expensesForMonth: Expense[];
   onEdit: (budget: BudgetType) => void;
+  currencyPreference: string;
 }
 
-export const BudgetListItem: React.FC<BudgetListItemProps> = ({ budget, expensesForMonth, onEdit }) => {
+export const BudgetListItem: React.FC<BudgetListItemProps> = ({ budget, expensesForMonth, onEdit, currencyPreference }) => {
   const spentAmount = expensesForMonth
     .filter(expense => expense.category === budget.category)
     .reduce((sum, expense) => sum + expense.amount, 0);
@@ -23,7 +25,10 @@ export const BudgetListItem: React.FC<BudgetListItemProps> = ({ budget, expenses
   const remainingAmount = budget.amount - spentAmount;
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+    return new Intl.NumberFormat('en-US', { 
+      style: 'currency', 
+      currency: currencyPreference 
+    }).format(amount);
   };
 
   let progressColorClass = 'bg-primary'; // Default teal
@@ -59,3 +64,4 @@ export const BudgetListItem: React.FC<BudgetListItemProps> = ({ budget, expenses
     </Card>
   );
 };
+

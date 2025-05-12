@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -5,6 +6,7 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Responsive
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartConfig, ChartContainer, ChartTooltipContent } from "@/components/ui/chart"
 import { useAppData } from "@/contexts/AppDataContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { EXPENSE_CATEGORIES } from "@/lib/constants";
 
 const initialChartData = EXPENSE_CATEGORIES.map(category => ({ category, total: 0 }));
@@ -20,6 +22,7 @@ const chartConfig = EXPENSE_CATEGORIES.reduce((acc, category, index) => {
 
 export function ExpenseChart() {
   const { data } = useAppData();
+  const { user } = useAuth();
 
   const aggregatedExpenses = React.useMemo(() => {
     const expenseMap = new Map<string, number>();
@@ -36,7 +39,10 @@ export function ExpenseChart() {
 
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+    return new Intl.NumberFormat('en-US', { 
+      style: 'currency', 
+      currency: user?.currencyPreference || 'USD' 
+    }).format(value);
   }
 
   return (
@@ -71,3 +77,4 @@ export function ExpenseChart() {
     </Card>
   )
 }
+

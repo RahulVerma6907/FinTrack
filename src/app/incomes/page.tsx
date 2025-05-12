@@ -1,9 +1,11 @@
+
 "use client";
 
 import React from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import { IncomeForm } from '@/components/forms/IncomeForm';
 import { useAppData } from '@/contexts/AppDataContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -21,17 +23,23 @@ import {
 } from "@/components/ui/dialog"
 
 export default function IncomesPage() {
-  const { data, loading } = useAppData();
+  const { data, loading: appDataLoading } = useAppData();
+  const { user, loading: authLoading } = useAuth();
   const [isFormOpen, setIsFormOpen] = React.useState(false);
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+    return new Intl.NumberFormat('en-US', { 
+      style: 'currency', 
+      currency: user?.currencyPreference || 'USD' 
+    }).format(amount);
   };
 
   const sortedIncomes = React.useMemo(() => 
     [...data.incomes].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
     [data.incomes]
   );
+  
+  const loading = appDataLoading || authLoading;
 
   return (
     <AppLayout>
@@ -102,3 +110,4 @@ export default function IncomesPage() {
     </AppLayout>
   );
 }
+
